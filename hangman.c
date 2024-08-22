@@ -8,19 +8,22 @@ void print_help(void){
 }
 
 void print_start_screen(){
-    printf("--------------------------------------------------------\n");
-    printf("------Start with a random word--------------------------\n");
-    printf("------Start with a custom word--------------------------\n");
-    printf("--------------------------------------------------------\n");
-    printf("--------------------------------------------------------\n");
-    printf("--------------------------------------------------------\n");
+    printf("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+    printf("\n");
+    printf("         1.    Start with a random word                 \n");
+    printf("\n");
+    printf("         2.    Start with a custom word                 \n");
+    printf("\n");
+    printf("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+    // testing other drawings
+    printf("_______\n|/     |\n|      O\n|     /|\\\n|     / \\\n|\\\n| \\");
 }
 
 int main (int argc, char **argv) {
     
     int c;
 
-    if (strcmp(argv[1],"-h")== 0 || strcmp(argv[1],"-help")== 0 )  {
+    if (argc >= 2 && (strcmp(argv[1],"-h")== 0 || strcmp(argv[1],"-help")== 0 ))  {
         print_help();
         return 0;
     }
@@ -35,6 +38,6 @@ int main (int argc, char **argv) {
     //system("cls"); // almost any platform
     printf("\e[1;1H\e[2J"); //regex - faster
     */
-    printf("ended!\n");
+    printf("\nThanks for playing!\n");
     return 0;
 }
