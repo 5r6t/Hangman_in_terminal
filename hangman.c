@@ -14,6 +14,8 @@ void print_start_screen(){
     printf("\n");
     printf("         2.    Start with a custom word                 \n");
     printf("\n");
+    printf("(enter either number '1' or '2' and 'enter' to start the game)\n");
+    printf("\n");
     printf("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
     // testing other drawings
     printf("_______\n|/     |\n|      O\n|     /|\\\n|     / \\\n|\\\n| \\");
