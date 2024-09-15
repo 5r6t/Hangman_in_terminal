@@ -1,14 +1,15 @@
 #include <stdio.h>  
 #include <stdlib.h>
 #include <string.h>
-#include <time.h> // for random numbers
+#include <time.h> // seed for rand function
 #include <ctype.h>
 
-#define MAX_WORD_SIZE 15
+#define MAX_WORD_SIZE 15 // please don't increase the size
 #define DICTIONARY_SIZE 100
 
 //Declarations
 void game_screen ();
+// -----------------
 
 void clear_input_buffer () {
     int c;
@@ -18,84 +19,213 @@ void clear_screen () {
     printf("\e[1;1H\e[2J"); //regex - faster, clear the screen
 }
 void print_help(void){
-    printf("Welcome to the classic hangman game! Made by Jackie in 2024\n");
+    printf("Welcome to the terminal hangman game! Made by Jackie in 2024\n");
 }
-enum menuOptions{
-    randomWord = 1,
-    customWord,
-    help
-};
+
+enum menuOptions{ randomWord = 1, customWord = 2, help = 3};
+enum gameEnd{ win = 0, loss = 1, start = 2 };
+enum Boolean{ bool_true = 0, bool_false = 1 };
 
 struct game_data {
+    int flag_game_end;
     int word_length;
     int mistakes;
     char input_letter;
     char game_word[MAX_WORD_SIZE+1];
-    char line1[9];
-    char line2[10];
-    char line3[10];
-    char line4[17 + MAX_WORD_SIZE];
-    char line5[12];
-    char line6[5];
-    char line7[4];
+    char game_hidden_word[MAX_WORD_SIZE+1];
+    char* lines[7];
 };
-struct game_data g1 = { .mistakes = 1, .line4 = {""} };
+struct game_data g1 = { .mistakes = 0, .flag_game_end = start};
 
-void game_update () {
-    printf("DEBUG: word length = %d\n", g1.word_length);
-    printf("DEBUG: game word: %s\n", g1.game_word);
-    printf("DEBUG: mistakes: %d\n", g1.mistakes);
-    //strcpy(g1.line4, "world!");
-    //strcpy(&array[7], "world!");
-    switch (g1.mistakes) {
-        default: break;
-        case 1:
-            memcpy(g1.line2, "|/", strlen("|/"));
-            memcpy(g1.line3, "|", strlen("|"));
-            memcpy(g1.line4, "|", strlen("|"));
-            memcpy(g1.line5, "|", strlen("|"));
-            memcpy(g1.line6, "|\\", strlen("|\\"));
-            memcpy(g1.line7, "| \\", strlen("| \\"));
-            break;
-        case 2:5
+void array_initializer () {
+    for (int i = 0; i < 7; i++) {
+        g1.lines[i] = malloc(50);
+        memset(g1.lines[i], ' ', 49);
+        g1.lines[i][49] = '\0';
     }
-    /*  printf("_______\n");                  //plank
-    printf("|/     |\n");                //rope
-    printf("|      o\n");              //head
-    printf("|     /|\\\n");           //arms
-    printf("|     / \\\n")           // legs
-    printf("|\\\n");                // bottom1
-    printf("| \\\n");              // bottom2*/
+}
+void init_word () {
+    memset(g1.game_hidden_word, '_', g1.word_length);  // Set 'word_length' spaces
+    g1.game_hidden_word[g1.word_length+1] = '\0';    
+}
+void array_free () {
+     for (int i = 0; i < 7; i++) {
+        free(g1.lines[i]);
+    }
+}
+void game_update () {
+    //printf("DEBUG: word length = %d\n", g1.word_length);
+    //printf("DEBUG: game word: %s\n", g1.game_word);
+    switch (g1.mistakes) { // for clarity and debugging purposes, each number of mistakes can build its own gallow
+        default: break; // no mistakes
+        case 1: // gallows vertical
+            memcpy(g1.lines[1], "|/",          strlen("|/"));
+            memcpy(g1.lines[2], "|",           strlen("|"));
+            memcpy(g1.lines[3], "|",           strlen("|"));
+            memcpy(g1.lines[4], "|",           strlen("|"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            break;
+        case 2: // gallows horizontal
+            memcpy(g1.lines[0], "_______",     strlen("_______"));
+            memcpy(g1.lines[1], "|/",          strlen("|/"));
+            memcpy(g1.lines[2], "|",           strlen("|"));
+            memcpy(g1.lines[3], "|",           strlen("|"));
+            memcpy(g1.lines[4], "|",           strlen("|"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            break;
+        case 3: // gallows rope
+            memcpy(g1.lines[0], "_______",     strlen("_______"));
+            memcpy(g1.lines[1], "|/     |",    strlen("|/     |"));
+            memcpy(g1.lines[2], "|",           strlen("|"));
+            memcpy(g1.lines[3], "|",           strlen("|"));
+            memcpy(g1.lines[4], "|",           strlen("|"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            break;
+        case 4: // hangman head
+            memcpy(g1.lines[0], "_______",     strlen("_______"));
+            memcpy(g1.lines[1], "|/     |",    strlen("|/     |"));
+            memcpy(g1.lines[2], "|      O",    strlen("|      O"));
+            memcpy(g1.lines[3], "|",           strlen("|"));
+            memcpy(g1.lines[4], "|",           strlen("|"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            break;
+        case 5: // hangman torso
+            memcpy(g1.lines[0], "_______",     strlen("_______"));
+            memcpy(g1.lines[1], "|/     |",    strlen("|/     |"));
+            memcpy(g1.lines[2], "|      O",    strlen("|      O"));
+            memcpy(g1.lines[3], "|      |",    strlen("|      |"));
+            memcpy(g1.lines[4], "|",           strlen("|"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            break;
+        case 6: // hangman left arm
+            memcpy(g1.lines[0], "_______",     strlen("_______"));
+            memcpy(g1.lines[1], "|/     |",    strlen("|/     |"));
+            memcpy(g1.lines[2], "|      O",    strlen("|      O"));
+            memcpy(g1.lines[3], "|     /|",    strlen("|     /|"));
+            memcpy(g1.lines[4], "|",           strlen("|"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            break;
+        case 7: // hangman right arm
+            memcpy(g1.lines[0], "_______",     strlen("_______"));
+            memcpy(g1.lines[1], "|/     |",    strlen("|/     |"));
+            memcpy(g1.lines[2], "|      O",    strlen("|      O"));
+            memcpy(g1.lines[3], "|     /|\\",  strlen("|     /|\\"));
+            memcpy(g1.lines[4], "|",           strlen("|"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            break;
+        case 8: // hangman left leg
+            memcpy(g1.lines[0], "_______",     strlen("_______"));
+            memcpy(g1.lines[1], "|/     |",    strlen("|/     |"));
+            memcpy(g1.lines[2], "|      O",    strlen("|      O"));
+            memcpy(g1.lines[3], "|     /|\\",  strlen("|     /|\\"));
+            memcpy(g1.lines[4], "|     /",     strlen("|     /"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            break;
+        case 9: // hangman right leg  -> fail - signal/display game end    
+            memcpy(g1.lines[0], "_______",     strlen("_______"));
+            memcpy(g1.lines[1], "|/     |",    strlen("|/     |"));
+            memcpy(g1.lines[2], "|      O",    strlen("|      O"));
+            memcpy(g1.lines[3], "|     /|\\",  strlen("|     /|\\"));
+            memcpy(g1.lines[4], "|     / \\",  strlen("|     / \\"));
+            memcpy(g1.lines[5], "|\\",         strlen("|\\"));
+            memcpy(g1.lines[6], "| \\",        strlen("| \\"));
+            g1.flag_game_end = loss;
+            break;
+    } // end switch
     game_screen();
+}
+void find_letter() {
+    // g1.input_letter + g1.game_word + g1.word_length
+    int found = 0;
+
+    for (int i = 0; i <= g1.word_length; i++) {
+        if (g1.input_letter == g1.game_word[i]) { // match found 
+            found = 1;
+            break;
+        }
+    }
+    if (!found) {
+        g1.mistakes++;
+    }
+    else {
+        for (int i = 0; i <= g1.word_length; i++) {
+            if (g1.input_letter == g1.game_word[i]) {
+                g1.game_hidden_word[i] = g1.game_word[i];
+            }
+        }
+    }
+    game_update();
 }
 
 void game_screen () {
+    memcpy(g1.lines[3]+17, g1.game_hidden_word, strlen(g1.game_hidden_word));
+    printf("> Mistakes: %d/9\n", g1.mistakes);
     printf("--------------------------------------------------------\n");
-    printf("%s\n",g1.line1);
-    printf("%s\n",g1.line2);
-    printf("%s\n",g1.line3);
-    printf("%s\n",g1.line4);
-    printf("%s\n",g1.line5);
-    printf("%s\n",g1.line6);
-    printf("%s\n",g1.line7);
+    printf("\t%s\n",g1.lines[0]);
+    printf("\t%s\n",g1.lines[1]);
+    printf("\t%s\n",g1.lines[2]);
+    printf("\t%s\n",g1.lines[3]);
+    printf("\t%s\n",g1.lines[4]);
+    printf("\t%s\n",g1.lines[5]);
+    printf("\t%s\n",g1.lines[6]);
     printf("--------------------------------------------------------\n");
-    printf("please enter an alphabetic character of your choice: ");
-    // entry from user - a single letter - checks if alpha
-     while(1) {
+    printf("Please type an alphabetic character of your choice:     \n> ");
+
+    int match = bool_true;
+    for (int i = 0; i < g1.word_length; i++) { 
+        if (g1.game_word[i] != g1.game_hidden_word[i]) {
+            match = bool_false;
+            break;
+        }
+    }
+    if (match == bool_true) g1.flag_game_end = win;
+
+    if (g1.flag_game_end == win) {
+        clear_screen();
+        printf("> Mistakes: %d/9\n", g1.mistakes);
+        printf("--------------------------------------------------------\n");
+        printf("\n\"You saved me!\"\n\t     \\ O\n\t       |\\ \t Thanks for playing! \n\t      / \\\n\n"); //saved man with text
+        printf("--------------------------------------------------------\n");
+        printf("> The word was: %s\n", g1.game_word);
+        printf("--------------------------------------------------------\n");
+        array_free ();
+        return;
+    }
+    else if (g1.flag_game_end == loss) {
+        clear_screen();
+        printf("> Mistakes: %d/9\n", g1.mistakes);
+        printf("--------------------------------------------------------\n");
+        printf("\t_______\n\t|/     |\n\t|      O\n\t|     /|\\ \t Thanks for playing! \n\t|     / \\\n\t|\\\n\t| \\\n"); //hanged man with text
+        printf("--------------------------------------------------------\n");
+        printf("> The word was: %s\n", g1.game_word);
+        printf("--------------------------------------------------------\n");
+        array_free ();
+        return;
+    }
+
+    while(1) {
          if (scanf("%1c", &g1.input_letter) == 1) {
             if (isalpha(g1.input_letter) != 0) {
                 clear_input_buffer();
                 break;
             }
             else {
-                clear_input_buffer();  // Handle non-alphabetic input
+                clear_input_buffer();
                 printf("Please enter a single alphabetic character:\n");
             }
          }
          else exit(1); //fail
-    }
+    } // end loop
     clear_screen();
-    game_update();
+    find_letter();
 }
 
 void random_game() {
@@ -111,21 +241,24 @@ void random_game() {
     printf("--------------------------------------------------------\n");
 
     clear_input_buffer();
-    getchar();  
+    getchar(); // wait for any character
+
     FILE *file;
     if ((file = fopen("dictionary", "r")) == NULL) {
         fprintf(stderr, "There was a problem reading from the file \"dictionary\", please check\n");
         exit(1);
     }
-    int word_number = rand() % DICTIONARY_SIZE;
 
+    int word_number = rand() % DICTIONARY_SIZE;
+    // retrieve game word
     for (int i = 0; i < word_number; i++) {
         fgets(g1.game_word,MAX_WORD_SIZE, file);
     }
-    g1.word_length = strlen(g1.game_word) - 1;
+    fclose(file);
+    g1.word_length = strlen(g1.game_word) - 1; // '\0'
+    init_word();
+    clear_screen();
     game_screen();
-    //printf("%d", word_number);
-
 }
 
 void custom_game() {
@@ -134,17 +267,36 @@ void custom_game() {
     printf("--------------------------------------------------------\n");
     printf("--------------------------------------------------------\n");
     printf("-     In this mode you get to choose your own word.    -\n");
-    printf("-  LIMIT is 10 letters, longer words will be cut off.  -\n");
+    printf("-  LIMIT is 10 letters, longer words WILL be cut off.  -\n");
     printf("--------------------------------------------------------\n");
     printf("-            Type your desired word below:             -\n");
     printf("--------------------------------------------------------\n");
     
-    char custom_word_buffer[MAX_WORD_SIZE];
-    scanf("%10s", custom_word_buffer);
+    char str[11];
+        while (1) {
+        printf("> ");
+        scanf("%10s", str);  // Read up to 10 characters
+        int valid = 1;  // Assume the input is valid initially
+
+        for (size_t i = 0; i < strlen(str); i++) {
+            if (!isalpha(str[i])) {
+                valid = 0;  // Set valid to false if a non-alphabetic character is found
+                break;
+            }
+        }
+
+        if (valid) {
+            break;
+        } else {
+            printf("Only alphabetic characters are allowed. Please try again.\n");
+            clear_input_buffer();  
+        }
+    }
     clear_input_buffer();
-    strcpy(g1.game_word, custom_word_buffer);
-    g1.word_length = strlen(g1.game_word) - 1;
+    strcpy(g1.game_word, str);
+    g1.word_length = strlen(g1.game_word);
     clear_screen();
+    init_word();
     game_screen();
 }
 
@@ -188,33 +340,9 @@ void main_menu(){
     }
     return;
 }
-
-
 int main () {
     srand(time(0)); //seed for rand function
+    array_initializer ();
     main_menu();
-    // end the game
-    //clear_screen();
-    printf("_______\n|/     |\n|      O\n|     /|\\ \t Thanks for playing! \n|     / \\\n|\\\n| \\\n");
     return 0;
 }
-
-    /*
-    while((c=fgetc(stdin))!='x') {
-        printf("\e[1;1H\e[2J");
-        printf("press x to clear and end\n");
-    }
-
-    //system("clear"); //linux specific
-    //system("cls"); // almost any platform
-    printf("\e[1;1H\e[2J"); //regex - faster
-     printf("_______\n|/     |\n|      O\n|     /|\\\n|     / \\\n|\\\n| \\");
-    */
-    /*  printf("_______\n");                  //plank
-    printf("|/     |\n");                //rope
-    printf("|      o\n");              //head
-    printf("|     /|\\\n");           //arms
-    printf("|     / \\\n")           // legs
-    printf("|\\\n");                // bottom1
-    printf("| \\\n");              // bottom2
-    printf(" \t ")                 //spacing */
