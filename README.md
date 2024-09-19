@@ -24,6 +24,7 @@ make run
 Required files for playing:
 * `dictionary`
 * `hangman.exe`
+
 To run the game on Windows, simply launch `hangman.exe` file.
 
 Required files for compiling:
