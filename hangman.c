@@ -343,6 +343,7 @@ void main_menu(){
     printf("--------------------------------------------------------\n");
     printf("            (Choose by typing in a number):             \n");
     printf("--------------------------------------------------------\n");
+    printf("> ");
 
     int sel_option;
     while(1) {
