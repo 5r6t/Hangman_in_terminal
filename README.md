@@ -1,4 +1,4 @@
-# Welcome to hangman in C/Terminal
+# Welcome to terminal hangman game (written in C)
 
 While there are still some imperfections, the game should work without any bugs.
 
