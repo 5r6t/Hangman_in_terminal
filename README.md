@@ -2,6 +2,7 @@
 This is a simple Hangman game that runs in the terminal. While there are some minor changes/improvements planned, it should work without any bugs.
 I hope you enjoy it:)
 
+## [Check out the newest release!]([docs/CONTRIBUTING.md](https://github.com/5r6t/Hangman_in_terminal.git/releases/latest))
 <img src="hangman_img_readme.bmp" alt="hangman_screenshot" width="400" height="200">
 
 ## Linux
