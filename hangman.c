@@ -5,11 +5,10 @@
 #include <ctype.h>
 
 #define MAX_WORD_SIZE 15 // please don't increase the size
-#define DICTIONARY_SIZE 100
+#define DICTIONARY_SIZE 100 // for proper seed
 
 //Declarations
 void game_screen ();
-// -----------------
 
 void clear_input_buffer () {
     int c;
@@ -19,7 +18,24 @@ void clear_screen () {
     printf("\e[1;1H\e[2J"); //regex - faster, clear the screen
 }
 void print_help(void){
-    printf("Welcome to the terminal hangman game! Made by Jackie in 2024\n");
+    printf("--------------------------------------------------------\n");
+    printf("|       Welcome to the Terminal Hangman Game!          |\n");
+    printf("|               Made by Jackie in 2024                 |\n");
+    printf("--------------------------------------------------------\n\n");
+
+    printf("This game currently has 2 game modes:\n");
+    printf("\t1. Custom: You type in your desired word.\n");
+    printf("\t2. Random: A word is randomly chosen for you.\n\n");
+
+    printf("You can add words to the dictionary, but please:\n");
+    printf("\t* Do not exceed 15 letters per word.\n");
+    printf("\t* Ensure the dictionary always contains exactly\n");
+    printf("\t  100 words.\n\n");
+
+    printf("--------------------------------------------------------\n");
+    printf("          Thanks for trying out my game! :3\n");
+    printf("--------------------------------------------------------\n");
+
 }
 
 enum menuOptions{ randomWord = 1, customWord = 2, help = 3};
@@ -167,6 +183,7 @@ void find_letter() {
 
 void game_screen () {
     memcpy(g1.lines[3]+17, g1.game_hidden_word, strlen(g1.game_hidden_word));
+    printf("--------------------------------------------------------\n");
     printf("> Mistakes: %d/9\n", g1.mistakes);
     printf("--------------------------------------------------------\n");
     printf("\t%s\n",g1.lines[0]);
@@ -190,23 +207,29 @@ void game_screen () {
 
     if (g1.flag_game_end == win) {
         clear_screen();
+        printf("--------------------------------------------------------\n");
         printf("> Mistakes: %d/9\n", g1.mistakes);
         printf("--------------------------------------------------------\n");
         printf("\n\"You saved me!\"\n\t     \\ O\n\t       |\\ \t Thanks for playing! \n\t      / \\\n\n"); //saved man with text
         printf("--------------------------------------------------------\n");
         printf("> The word was: %s\n", g1.game_word);
         printf("--------------------------------------------------------\n");
+        printf("> Press Enter Key to Exit The Game\n");
+        getchar(); 
         array_free ();
         return;
     }
     else if (g1.flag_game_end == loss) {
         clear_screen();
+        printf("--------------------------------------------------------\n");
         printf("> Mistakes: %d/9\n", g1.mistakes);
         printf("--------------------------------------------------------\n");
         printf("\t_______\n\t|/     |\n\t|      O\n\t|     /|\\ \t Thanks for playing! \n\t|     / \\\n\t|\\\n\t| \\\n"); //hanged man with text
         printf("--------------------------------------------------------\n");
         printf("> The word was: %s\n", g1.game_word);
         printf("--------------------------------------------------------\n");
+        printf("> Press Enter Key to Exit The Game\n");
+        getchar(); 
         array_free ();
         return;
     }
@@ -231,14 +254,18 @@ void game_screen () {
 void random_game() {
     clear_screen();
     printf("--------------------------------------------------------\n");
-    printf("-                   RANDOM WORD MODE                   -\n");
+    printf("|                   RANDOM WORD MODE                   |\n");
+    printf("--------------------------------------------------------\n\n");
+
     printf("--------------------------------------------------------\n");
+    printf("|     In this mode, a random word is chosen for you.   |\n");
+    printf("|                        Enjoy!                        |\n");
+    printf("--------------------------------------------------------\n\n");
+
     printf("--------------------------------------------------------\n");
-    printf("-       In this mode a random word is chosen for you.  -\n");
-    printf("-                       Enjoy!                         -\n");
+    printf("|               Press ENTER to continue                |\n");
     printf("--------------------------------------------------------\n");
-    printf("-                 Press ENTER to continue              -\n");
-    printf("--------------------------------------------------------\n");
+
 
     clear_input_buffer();
     getchar(); // wait for any character
@@ -263,14 +290,18 @@ void random_game() {
 
 void custom_game() {
     printf("--------------------------------------------------------\n");
-    printf("-                   CUSTOM WORD MODE                   -\n");
+    printf("|                   CUSTOM WORD MODE                   |\n");
+    printf("--------------------------------------------------------\n\n");
+
     printf("--------------------------------------------------------\n");
+    printf("|      In this mode, you get to choose your own word.  |\n");
+    printf("|   LIMIT is 10 letters; longer words WILL be cut off. |\n");
+    printf("--------------------------------------------------------\n\n");
+
     printf("--------------------------------------------------------\n");
-    printf("-     In this mode you get to choose your own word.    -\n");
-    printf("-  LIMIT is 10 letters, longer words WILL be cut off.  -\n");
+    printf("|             Type your desired word below:            |\n");
     printf("--------------------------------------------------------\n");
-    printf("-            Type your desired word below:             -\n");
-    printf("--------------------------------------------------------\n");
+
     
     char str[11];
         while (1) {
@@ -344,5 +375,6 @@ int main () {
     srand(time(0)); //seed for rand function
     array_initializer ();
     main_menu();
+
     return 0;
 }
