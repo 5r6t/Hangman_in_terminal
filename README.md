@@ -1,6 +1,8 @@
 # Welcome to Terminal Hangman Game (written in C)
 This is a simple Hangman game that runs in the terminal. While there are some minor changes/improvements planned, it should work without any bugs.
 
+<img src="hangman_img_readme.bmp" alt="hangman_screenshot" width="400" height="200">
+
 ## Linux
 Required files:
 * `dictionary`
