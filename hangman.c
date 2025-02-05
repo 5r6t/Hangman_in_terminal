@@ -35,7 +35,6 @@ void print_help(void){
     printf("--------------------------------------------------------\n");
     printf("          Thanks for trying out my game! :3\n");
     printf("--------------------------------------------------------\n");
-
 }
 
 enum menuOptions{ randomWord = 1, customWord = 2, help = 3};
@@ -374,7 +373,7 @@ void main_menu(){
 }
 int main () {
     srand(time(0)); //seed for rand function
-    array_initializer ();
+    array_initializer();
     main_menu();
 
     return 0;
